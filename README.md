@@ -1,6 +1,6 @@
 # ib-gateway-docker
 
-docker build .
+docker build . -t ib-gateway
 
 
 https://github.com/paulrosinger/ibc-docker/blob/master/Dockerfile

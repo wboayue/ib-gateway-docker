@@ -30,9 +30,9 @@ RUN chmod a+x ibgateway-latest-standalone-linux-x64.sh \
 COPY vendor/IBCLinux-3.16.0.zip IBCLinux-3.16.0.zip
 
 RUN unzip IBCLinux-3.16.0.zip -d /opt/ibc && chmod +x /opt/ibc/*.sh /opt/ibc/scripts/*.sh
+COPY config.ini.tmpl /opt/ibc/config.ini
 
 ENV IBC_PATH=/opt/ibc \
     TWS_MAJOR_VRSN=972 \
     TWS_PATH=/root/Jts
-
 
