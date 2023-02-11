@@ -25,7 +25,9 @@ RUN chmod a+x ibgateway-1020-standalone-linux-x64.sh \
 
 # Install IBC
 COPY vendor/IBCLinux-3.16.0.zip IBCLinux-3.16.0.zip
-RUN unzip IBCLinux-3.16.0.zip -d /opt/ibc && chmod +x /opt/ibc/*.sh /opt/ibc/scripts/*.sh
+RUN unzip IBCLinux-3.16.0.zip -d /opt/ibc \
+    && chmod +x /opt/ibc/*.sh /opt/ibc/scripts/*.sh \
+    && rm IBCLinux-3.16.0.zip
 COPY config.ini.tmpl /opt/ibc/config.ini
 
 ENV IBC_PATH=/opt/ibc \

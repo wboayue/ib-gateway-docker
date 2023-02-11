@@ -1,5 +1,5 @@
 #!/bin/bash
 echo "let start this"
 
-ls /opt
-ls /root
+ls -l /opt
+ls -l /root
