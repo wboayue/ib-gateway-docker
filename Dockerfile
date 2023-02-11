@@ -7,15 +7,11 @@ ENV DEBIAN_FRONTEND=noninteractive \
 
 LABEL maintainer="Wil Boayue <wil.boayue@gmail.com>"
 
-RUN apt-get update && apt-get install -y \
-      unzip \
-      xvfb \
-      x11vnc \
-      default-jre \
-      metacity \
-      openjfx && apt-get clean
+RUN apt-get update \
+    && apt-get install -y unzip xvfb x11vnc default-jre metacity openjfx \
+    && apt-get clean
 
-WORKDIR /opt
+WORKDIR /root
 
 # Install IB Gateway
 COPY vendor/ibgateway-1020-standalone-linux-x64.sh ibgateway-1020-standalone-linux-x64.sh
@@ -31,7 +27,7 @@ RUN unzip IBCLinux-3.16.0.zip -d /opt/ibc \
 COPY config.ini.tmpl /opt/ibc/config.ini
 
 ENV IBC_PATH=/opt/ibc \
-    TWS_MAJOR_VRSN=972 \
+    TWS_MAJOR_VRSN=1020 \
     TWS_PATH=/root/Jts \
     DISPLAY=:0 \
     TZ=America/New_York
