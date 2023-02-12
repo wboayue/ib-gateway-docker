@@ -15,7 +15,7 @@ fi
 
 Xvfb ${DISPLAY} -ac -screen 0 1024x768x16 &
 
-# Starts VNC server so virtual desktop can be viwed.
+# Starts VNC server so virtual desktop can be viewed.
 
 x11vnc -ncache_cr -display ${DISPLAY} -forever -shared -logappend /var/log/x11vnc.log -bg -noipv6
 
@@ -25,8 +25,8 @@ TRADING_MODE="${TRADING_MODE:-live}"
 IBC_INI=$IBC_PATH/config.ini
 
 mkdir -p ~/ibc
-sed -e "s/IbLoginId=edemo/IbLoginId=${IB_LOGIN}/;s/IbPassword=demouser/IbPassword=${IB_PASSWORD}/;s/TradingMode=live/TradingMode=${TRADING_MODE}/" > ~/ibc/config.ini
 
+sed -e "s/IbLoginId=edemo/IbLoginId=${IB_LOGIN}/;s/IbPassword=demouser/IbPassword=${IB_PASSWORD}/;s/TradingMode=live/TradingMode=${TRADING_MODE}/" > ~/ibc/config.ini
 sed --in-place=.bak -e "s/TWS_MAJOR_VRSN=1019/TWS_MAJOR_VRSN=${TWS_MAJOR_VRSN}/" /opt/ibc/gatewaystart.sh
 
 /opt/ibc/gatewaystart.sh -inline
