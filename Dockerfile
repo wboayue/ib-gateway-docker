@@ -1,11 +1,11 @@
 FROM ubuntu:latest
 
+LABEL maintainer="Wil Boayue <wil.boayue@gmail.com>"
+
 ENV DEBIAN_FRONTEND=noninteractive \
     DISABLE_SYSLOG=0 \
     DISABLE_SSH=1 \
     DISABLE_CRON=1
-
-LABEL maintainer="Wil Boayue <wil.boayue@gmail.com>"
 
 RUN apt-get update \
     && apt-get install -y unzip xvfb x11vnc default-jre metacity openjfx \
@@ -14,24 +14,24 @@ RUN apt-get update \
 WORKDIR /root
 
 # Install IB Gateway
+
 COPY vendor/ibgateway-1020-standalone-linux-x64.sh ibgateway-1020-standalone-linux-x64.sh
 RUN chmod a+x ibgateway-1020-standalone-linux-x64.sh \
-    && echo "\nn" | sh ./ibgateway-1020-standalone-linux-x64.sh \
+    && printf "\nn\n" | sh ./ibgateway-1020-standalone-linux-x64.sh \
     && rm ibgateway-1020-standalone-linux-x64.sh
 
 # Install IBC
-ENV TWS_MAJOR_VRSN=1020
 
 COPY vendor/IBCLinux-3.16.0.zip IBCLinux-3.16.0.zip
 RUN unzip IBCLinux-3.16.0.zip -d /opt/ibc \
     && chmod +x /opt/ibc/*.sh /opt/ibc/scripts/*.sh \
     && rm IBCLinux-3.16.0.zip
-COPY config.ini.tmpl /opt/ibc/config.ini
 
 # Configure and launch gateway
 
 ENV IBC_PATH=/opt/ibc \
     TWS_PATH=/root/Jts \
+    TWS_MAJOR_VRSN=1020 \
     DISPLAY=:0 \
     TZ=America/New_York
 
