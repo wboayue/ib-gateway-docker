@@ -27,7 +27,7 @@ RUN unzip IBCLinux-3.16.0.zip -d /opt/ibc \
     && chmod +x /opt/ibc/*.sh /opt/ibc/scripts/*.sh \
     && rm IBCLinux-3.16.0.zip
 
-# Configure and launch gateway
+# Configure and launch IB Gateway
 
 ENV IBC_PATH=/opt/ibc \
     TWS_PATH=/root/Jts \
