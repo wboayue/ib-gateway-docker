@@ -20,14 +20,17 @@ RUN chmod a+x ibgateway-1020-standalone-linux-x64.sh \
     && rm ibgateway-1020-standalone-linux-x64.sh
 
 # Install IBC
+ENV TWS_MAJOR_VRSN=1020
+
 COPY vendor/IBCLinux-3.16.0.zip IBCLinux-3.16.0.zip
 RUN unzip IBCLinux-3.16.0.zip -d /opt/ibc \
     && chmod +x /opt/ibc/*.sh /opt/ibc/scripts/*.sh \
     && rm IBCLinux-3.16.0.zip
 COPY config.ini.tmpl /opt/ibc/config.ini
 
+# Configure and launch gateway
+
 ENV IBC_PATH=/opt/ibc \
-    TWS_MAJOR_VRSN=1020 \
     TWS_PATH=/root/Jts \
     DISPLAY=:0 \
     TZ=America/New_York
