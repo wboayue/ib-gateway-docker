@@ -35,7 +35,6 @@ ENV IBC_PATH=/opt/ibc \
     DISPLAY=:0 \
     TZ=America/New_York
 
-COPY forward_ports.sh forward_ports.sh
 COPY launch_gateway.sh launch_gateway.sh
 
 CMD ./launch_gateway.sh
