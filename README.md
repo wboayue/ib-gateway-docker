@@ -41,8 +41,6 @@ IB_PASSWORD=<ib password>
 
 The image with the tag latest is built with Interactive Brokers Gateway version 10.20 and IBC version 3.16.0.
 
-If the container needs to be customized, source is located at [wboayue/ibc-gateway-docker](https://github.com/wboayue/ib-gateway-docker)
-
 # Development
 
 ## Build container
