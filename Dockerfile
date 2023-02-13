@@ -8,7 +8,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     DISABLE_CRON=1
 
 RUN apt-get update \
-    && apt-get install -y unzip xvfb x11vnc default-jre metacity openjfx \
+    && apt-get install -y unzip xvfb x11vnc default-jre metacity openjfx socat \
     && apt-get clean
 
 WORKDIR /root
@@ -35,6 +35,7 @@ ENV IBC_PATH=/opt/ibc \
     DISPLAY=:0 \
     TZ=America/New_York
 
+COPY forward_ports.sh forward_ports.sh
 COPY launch_gateway.sh launch_gateway.sh
 
 CMD ./launch_gateway.sh
