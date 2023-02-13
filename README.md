@@ -1,16 +1,51 @@
-# Runs the Interactive Brokers Gateway 
+# Interactive Brokers Gateway Docker
 
-Runs the interactive brokers gateway in a docker container. 
-Automates authentication using IBC and starts VNC server so desktop may be viewed using a VNC client.
+Runs the Interactive Brokers Gateway in a docker container.
 
-This container could be useful setting up an automated trading system using Interactive Brokers as your broker.
+The image contains the following components.
 
-The following projects were used as references [paulrosinger/ibc-docker](https://github.com/paulrosinger/ibc-docker), [waytrade/ib-gateway-docker](https://github.com/waytrade/ib-gateway-docker) and [UnusualAlpha/ib-gateway-docker](https://github.com/UnusualAlpha/ib-gateway-docker)
+* [IB Gateway Application](https://www.interactivebrokers.com/en/index.php?f=16457)
+* [IBC Application](https://github.com/IbcAlpha/IBC) - enables automated launch of the IB Gateway Application.
+* [Xvfb](https://www.x.org/releases/X11R7.6/doc/man/man1/Xvfb.1.xhtml) -
+a X11 virtual framebuffer to run IB Gateway Application without graphics hardware.
+* [x11vnc](https://wiki.archlinux.org/title/x11vnc) -
+a VNC server that allows to interact with the IB Gateway user interface 
 
-# Build container
+# Usage
 
-Gateway downloads here
-https://www.interactivebrokers.com/en/trading/ib-gateway-download.php
+The simplest way to use the container is with the prebuilt image.
+
+Given that Interactive Broker credentials are defined in a file named `credentials.env`. The gateway can be launched using the following commands.
+
+The following command will launch the gateway in **live mode**.
+
+```bash
+docker run --env-file credentials.env -p 5900:5900 -p 4001:4001 wboayue/ib-gateway:latest
+```
+
+The following command will launch the gateway in **paper mode**.
+
+```bash
+docker run --env-file credentials.env -e TRADING_MODE=paper -p 5900:5900 -p 4002:4002 wboayue/ib-gateway:latest
+```
+
+When the container successfully launches the interactive broker gateway runs on port 4001 for live mode and port 4002 for paper mode.
+The VNC server runs on port 5900. It is assumed that the container runs on a secure network.The VNC server does not require a password.
+
+Credentials are specified in `credentials.env` using the following format.
+
+```text
+IB_LOGIN=<ib login>
+IB_PASSWORD=<ib password>
+```
+
+The image with the tag latest is built with Interactive Brokers Gateway version 10.20 and IBC version 3.16.0.
+
+If the container needs to be customized, source is located at [wboayue/ibc-gateway-docker](https://github.com/wboayue/ib-gateway-docker)
+
+# Development
+
+## Build container
 
 ```bash
 docker build -t ib-gateway:latest .
@@ -23,7 +58,7 @@ docker run --env-file ib-paper.env -p 5900:5900 -p 4002:4002 ib-gateway
 ```
 
 ```bash
-docker run --env-file ib-live.env -p 5900:5900 -p 4002:4002 ib-gateway
+docker run --env-file ib-live.env -p 5900:5900 -p 4001:4001 ib-gateway
 ```
 
 ## Configuration
