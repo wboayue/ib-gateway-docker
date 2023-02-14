@@ -1,36 +1,63 @@
 #!/bin/bash
+#
+# Launches the Interactive Brokers Gateway using IBC.
 set -eu
 
-if [[ -z "${IB_LOGIN}" ]]; then
-    echo "Environment variable IB_LOGIN is required. It specifies the TWS username." 
-    exit 1
-fi
+function validate_arguments() {
+    if [[ -z "${IB_LOGIN}" ]]; then
+        echo "Environment variable IB_LOGIN is required. It specifies the TWS username." 
+        exit 1
+    fi
 
-if [[ -z "${IB_PASSWORD}" ]]; then
-    echo "Environment variable IB_PASSWORD is required. It specifies the TWS password." 
-    exit 1
-fi
+    if [[ -z "${IB_PASSWORD}" ]]; then
+        echo "Environment variable IB_PASSWORD is required. It specifies the TWS password." 
+        exit 1
+    fi
+}
 
-# Starts a virtual desktop.
+function start_virtual_desktop() {
+    Xvfb ${DISPLAY} -ac -screen 0 1024x768x16 &
+}
 
-Xvfb ${DISPLAY} -ac -screen 0 1024x768x16 &
+function start_vnc_server() {
+    x11vnc -ncache_cr -display ${DISPLAY} -forever -shared -logappend /var/log/x11vnc.log -bg -noipv6
+}
 
-# Starts VNC server so virtual desktop can be viewed.
+function forward_ports() {
+    sleep 5
 
-x11vnc -ncache_cr -display ${DISPLAY} -forever -shared -logappend /var/log/x11vnc.log -bg -noipv6
+    if [ "$TRADING_MODE" = "paper" ]; then
+        printf "\nForwarding 0.0.0.0:4002 -> :::4000\n\n"
+        socat TCP-LISTEN:4002,fork TCP:127.0.0.1:4000
+    else
+        printf "\nForwarding 0.0.0.0:4001 -> :::4000\n\n"
+        socat TCP-LISTEN:4001,fork TCP:127.0.0.1:4000
+    fi
+}
 
-# Configures and starts IB Gateway using IBC.
+function configure_ibc() {
+    TRADING_MODE="${TRADING_MODE:-live}"
 
-TRADING_MODE="${TRADING_MODE:-live}"
-IBC_INI=$IBC_PATH/config.ini
+    mkdir -p ~/ibc
 
-# Relay port so connection appears from localhost to IB gateway
+    sed -e "s/IbLoginId=edemo/IbLoginId=${IB_LOGIN}/;s/IbPassword=demouser/IbPassword=${IB_PASSWORD}/;s/TradingMode=live/TradingMode=${TRADING_MODE}/;s/OverrideTwsApiPort=/OverrideTwsApiPort=4000/;s/AcceptNonBrokerageAccountWarning=no/AcceptNonBrokerageAccountWarning=yes/" /opt/ibc/config.ini > ~/ibc/config.ini
+    sed --in-place=.bak -e "s/TradingMode=live/TradingMode=${TRADING_MODE}/" ~/ibc/config.ini
+    sed --in-place=.bak -e "s/OverrideTwsApiPort=/OverrideTwsApiPort=4000/" ~/ibc/config.ini
+    sed --in-place=.bak -e "s/AcceptNonBrokerageAccountWarning=no/AcceptNonBrokerageAccountWarning=yes/" ~/ibc/config.ini
 
-/root/forward_ports.sh &
+    sed --in-place=.bak -e "s/TWS_MAJOR_VRSN=1019/TWS_MAJOR_VRSN=${TWS_MAJOR_VRSN}/" /opt/ibc/gatewaystart.sh
+}
 
-mkdir -p ~/ibc
+function main() {
+    validate_arguments
 
-sed -e "s/IbLoginId=edemo/IbLoginId=${IB_LOGIN}/;s/IbPassword=demouser/IbPassword=${IB_PASSWORD}/;s/TradingMode=live/TradingMode=${TRADING_MODE}/;s/OverrideTwsApiPort=/OverrideTwsApiPort=4000/;s/AcceptNonBrokerageAccountWarning=no/AcceptNonBrokerageAccountWarning=yes/" /opt/ibc/config.ini > ~/ibc/config.ini
-sed --in-place=.bak -e "s/TWS_MAJOR_VRSN=1019/TWS_MAJOR_VRSN=${TWS_MAJOR_VRSN}/" /opt/ibc/gatewaystart.sh
+    start_virtual_desktop
+    start_vnc_server
 
-/opt/ibc/gatewaystart.sh -inline
+    forward_ports &
+
+    configure_ibc
+    /opt/ibc/gatewaystart.sh -inline
+}
+
+main "$@"
